@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Nhân Sự</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+        }
+
+        .btn-edit {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Quản Lý Nhân Sự</h1>
+
+    <input type="hidden" id="editIndex">
+
+    <label>Họ tên</label>
+    <input type="text" id="name">
+
+    <label>Chức vụ</label>
+    <input type="text" id="position">
+
+    <label>Phòng ban</label>
+    <input type="text" id="department">
+
+    <label>Lương</label>
+    <input type="number" id="salary">
+
+    <button onclick="saveEmployee()">Lưu nhân viên</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Họ tên</th>
+                <th>Chức vụ</th>
+                <th>Phòng ban</th>
+                <th>Lương</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="employeeTable"></tbody>
+    </table>
+</div>
+
+<script>
+    let employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+    function saveEmployee() {
+        let name = document.getElementById("name").value;
+        let position = document.getElementById("position").value;
+        let department = document.getElementById("department").value;
+        let salary = document.getElementById("salary").value;
+        let editIndex = document.getElementById("editIndex").value;
+
+        if (!name || !position || !department || !salary) {
+            alert("Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
+
+        let employee = { name, position, department, salary };
+
+        if (editIndex === "") {
+            employees.push(employee);
+        } else {
+            employees[editIndex] = employee;
+            document.getElementById("editIndex").value = "";
+        }
+
+        localStorage.setItem("employees", JSON.stringify(employees));
+        clearForm();
+        renderTable();
+    }
+
+    function renderTable() {
+        let table = document.getElementById("employeeTable");
+        table.innerHTML = "";
+
+        employees.forEach((emp, index) => {
+            table.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.position}</td>
+                    <td>${emp.department}</td>
+                    <td>${emp.salary}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editEmployee(${index})">Sửa</button>
+                        <button class="btn-delete" onclick="deleteEmployee(${index})">Xóa</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function editEmployee(index) {
+        let emp = employees[index];
+        document.getElementById("name").value = emp.name;
+        document.getElementById("position").value = emp.position;
+        document.getElementById("department").value = emp.department;
+        document.getElementById("salary").value = emp.salary;
+        document.getElementById("editIndex").value = index;
+    }
+
+    function deleteEmployee(index) {
+        if (confirm("Bạn có chắc muốn xóa nhân viên này?")) {
+            employees.splice(index, 1);
+            localStorage.setItem("employees", JSON.stringify(employees));
+            renderTable();
+        }
+    }
+
+    function clearForm() {
+        document.getElementById("name").value = "";
+        document.getElementById("position").value = "";
+        document.getElementById("department").value = "";
+        document.getElementById("salary").value = "";
+    }
+
+    renderTable();
+</script>
+<h1>thay oi la thay</h1>
+</body>
+</html>
